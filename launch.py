@@ -1,11 +1,3 @@
-# from pyDRTtools.GUI import launch_gui
-
-# def main():
-#     launch_gui()
-
-# if __name__ == "__main__":
-#     main()
-
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -13,6 +5,7 @@ from numpy import log10, absolute, angle
 import matplotlib.pyplot as plt
 from pyDRTtools import layout
 from pyDRTtools.runs import *
+from pyDRTtools.GUI import *
 
 def launch_gui():
     st.set_page_config(page_title="DRTtools", page_icon=":chart_with_upwards_trend:", layout="wide")
@@ -21,11 +14,42 @@ def launch_gui():
     # Initialize data
     data = None
 
-    # Sidebar widgets
-    uploaded_file = st.sidebar.file_uploader("Choose a CSV or TXT file", type=["csv", "txt"])
+    uploaded_file = st.file_uploader("Choose a CSV or TXT file", type=["csv", "txt"])
 
-    induct_options = ["Fitting w/o Inductance", "Fitting with Inductance", "Discard Inductive Data"]
-    induct_choice = st.sidebar.selectbox("Inductance Included", induct_options)
+    if uploaded_file is not None:
+        # Read data
+        data = EIS_object.from_file(uploaded_file)
+
+    sidebar_container_setting = st.sidebar.container()
+    with sidebar_container_setting:
+        with st.expander("Setting"):
+            # Processing parameters
+            induct_options = ["Fitting w/o Inductance", "Fitting with Inductance", "Discard Inductive Data"]
+            induct_choice = st.sidebar.selectbox("Inductance Included", induct_options)
+            if induct_choice == "Discard Inductive Data" and data is not None:
+                data.freq = data.freq[-data.Z_double_prime > 0]
+                data.Z_prime = data.Z_prime[-data.Z_double_prime > 0]
+                data.Z_double_prime = data.Z_double_prime[-data.Z_double_prime > 0]
+                data.Z_exp = data.Z_prime + data.Z_double_prime * 1j
+            elif data is not None:
+                data.freq = data.freq_0
+                data.Z_prime = data.Z_prime_0
+                data.Z_double_prime = data.Z_double_prime_0
+                data.Z_exp = data.Z_exp_0
+
+            if data is not None:
+                data.tau = 1 / data.freq
+                data.tau_fine = np.logspace(log10(data.tau.min()) - 0.5, log10(data.tau.max()) + 0.5, 10 * data.freq.shape[0])
+                data.method = "none"
+                                
+            drt_type = st.selectbox("Type of DRT", ["gamma vs tau", "gamma vs frequency", "g vs tau", "g vs frequency"])
+            rbf_type = st.sidebar.selectbox("Method of Discretization", ["Gaussian", "C0 Matern", "C2 Matern", "C4 Matern", "C6 Matern", "Inverse Quadratic", "Inverse Quadric", "Cauchy"])
+            data_used = st.sidebar.selectbox("Data Used", ["Combined Re-Im Data", "Re Data", "Im Data"])
+            
+            
+            der_used = st.sidebar.selectbox("Regularization Derivative", ["1st order", "2nd order"])
+            cv_type = st.sidebar.selectbox("Regularization Method", ["custom", "GCV", "mGCV", "rGCV", "LC", "re-im", "kf"])
+            reg_param = st.sidebar.number_input("Regularization Parameter", value=1e-3, format="%.6f")
 
     if induct_choice == "Fitting w/o Inductance" :
         induct_used = 1
@@ -34,92 +58,70 @@ def launch_gui():
     else:
         induct_used = 0
 
-    # Processing parameters
-    rbf_type = st.sidebar.selectbox("RBF Type", ["Gaussian", "C0 Matern", "C2 Matern", "C4 Matern", "C6 Matern", "Inverse Quadratic", "Inverse Quadric", "Cauchy"])
-    data_used = st.sidebar.selectbox("Data Used", ["Combined Re-Im Data", "Re Data", "Im Data"])
-    der_used = st.sidebar.selectbox("Regularization Derivative", ["1st order", "2nd order"])
-    cv_type = st.sidebar.selectbox("Regularization Method", ["custom", "GCV", "mGCV", "rGCV", "LC", "re-im", "kf"])
-    reg_param = st.sidebar.number_input("Regularization Parameter", value=1e-3)
-
-
-    sidebar_container = st.sidebar.container()
-
-    with sidebar_container:
+    sidebar_container_rbf = st.sidebar.container()
+    with sidebar_container_rbf:
         with st.expander("Options for RBF"):
             shape_control = st.selectbox("RBF Shape Control", ["FWHM Coefficient", "Shape Factor"])
             coeff = st.number_input("FWHM Control", value=0.5)
 
-    if uploaded_file is not None:
-        # Read data
-        data = EIS_object.from_file(uploaded_file)
+    sidebar_container_Baye = st.sidebar.container()
+    with sidebar_container_Baye:
+        with st.expander("Options for Bayesian Run"):
+            sample_number = st.number_input("Sample Number", value=2000, min_value=1, step=1)
 
-        # Discard inductance data if necessary
-        if induct_choice == "Discard Inductive Data":
-            data.freq = data.freq[-data.Z_double_prime > 0]
-            data.Z_prime = data.Z_prime[-data.Z_double_prime > 0]
-            data.Z_double_prime = data.Z_double_prime[-data.Z_double_prime > 0]
-            data.Z_exp = data.Z_prime + data.Z_double_prime * 1j
-        else:
-            data.freq = data.freq_0
-            data.Z_prime = data.Z_prime_0
-            data.Z_double_prime = data.Z_double_prime_0
-            data.Z_exp = data.Z_exp_0
+    sidebar_container_Peak = st.sidebar.container()
+    with sidebar_container_Peak:
+        with st.expander("Options for Peak Analysis"):
+            peak_method = st.selectbox("Peak Method", ["separate", "combine"])
+            N_peaks = st.number_input("Number of Peaks", value=1.0, min_value=1.0, step=1.0)
 
-        data.tau = 1 / data.freq
-        data.tau_fine = np.logspace(log10(data.tau.min()) - 0.5, log10(data.tau.max()) + 0.5, 10 * data.freq.shape[0])
-        data.method = "none"
+    # if uploaded_file is not None:
+    #     # Read data
+    #     data = EIS_object.from_file(uploaded_file)
+
+    #     # Discard inductance data if necessary
+    #     if induct_choice == "Discard Inductive Data":
+    #         data.freq = data.freq[-data.Z_double_prime > 0]
+    #         data.Z_prime = data.Z_prime[-data.Z_double_prime > 0]
+    #         data.Z_double_prime = data.Z_double_prime[-data.Z_double_prime > 0]
+    #         data.Z_exp = data.Z_prime + data.Z_double_prime * 1j
+    #     else:
+    #         data.freq = data.freq_0
+    #         data.Z_prime = data.Z_prime_0
+    #         data.Z_double_prime = data.Z_double_prime_0
+    #         data.Z_exp = data.Z_exp_0
+
+    #     data.tau = 1 / data.freq
+    #     data.tau_fine = np.logspace(log10(data.tau.min()) - 0.5, log10(data.tau.max()) + 0.5, 10 * data.freq.shape[0])
+    #     data.method = "none"
 
     # Main content
     if data is not None:
-        # Display data
-        # st.write(data)
 
         # Plot options
-        plot_options = ["EIS_data", "Magnitude", "Phase", "Re_data", "Im_data", "Re_residual", "Im_residual", "DRT_data", "Score"]
+        plot_options = ["EIS_data", "Magnitude", "Phase", "Re_data", "Im_data", "Re_residual", "Im_residual", "DRT_data", "EIS_Score"]
         selected_plot = st.selectbox("Select Plot", plot_options)
 
         # Plot data
         fig, ax = plt.subplots()
         if selected_plot == "EIS_data":
-            ax.plot(data.Z_prime, -data.Z_double_prime, 'or')
-            ax.set_xlabel('$Z^{\prime}/\Omega$')
-            ax.set_ylabel('-$Z^{\prime \prime}/\Omega$')
-            ax.axis('equal')
+            EIS_data_plot(ax, data)
         elif selected_plot == "Magnitude":
-            ax.semilogx(data.freq, absolute(data.Z_exp), 'or')
-            ax.set_xlabel('$f/Hz$')
-            ax.set_ylabel('$|Z|/\Omega$')
-        # Add more plotting options based on the original code
+            Magnitude_plot(ax, data)
         elif selected_plot == "Phase":
-            ax.semilogx(data.freq, angle(data.Z_exp), 'or')
-            ax.set_xlabel('$f/Hz$')
-            ax.set_ylabel('$\phi/deg$')
+            Phase_plot(ax, data)
         elif selected_plot == "Re_data":
-            ax.semilogx(data.freq, data.Z_prime, 'or')
-            ax.set_xlabel('$f/Hz$')
-            ax.set_ylabel('$Z^{\prime}/\Omega$')
+            Re_data_plot(ax, data)
         elif selected_plot == "Im_data":
-            ax.semilogx(data.freq, data.Z_double_prime, 'or')
-            ax.set_xlabel('$f/Hz$')
-            ax.set_ylabel('$Z^{\prime \prime}/\Omega$')
+            Im_data_plot(ax, data)
         elif selected_plot == "Re_residual":
-            ax.semilogx(data.freq, data.Z_prime - data.Z_prime_fit, 'or')
-            ax.set_xlabel('$f/Hz$')
-            ax.set_ylabel('$Z^{\prime}_{residual}/\Omega$')
+            Re_residual_plot(ax, data)
         elif selected_plot == "Im_residual":
-            ax.semilogx(data.freq, data.Z_double_prime - data.Z_double_prime_fit, 'or')
-            ax.set_xlabel('$f/Hz$')
-            ax.set_ylabel('$Z^{\prime \prime}_{residual}/\Omega$')
-        # elif selected_plot == "DRT_data":
-        #     ax.semilogx(data.out_tau_vec, data.gamma, 'or')
-        #     ax.set_xlabel(r'$\tau/s$')
-        #     ax.set_ylabel(r'$\gamma(log \tau)/\Omega$')
-        #     ax.set_ylim([0, 1.1 * max(data.gamma)])
-        #     ax.set_xlim([min(data.out_tau_vec), max(data.out_tau_vec)])
+            Im_residual_plot(ax, data)
+        elif selected_plot == "DRT_data":
+            DRT_data_plot(ax, data)
         elif selected_plot == "Score":
-            ax.plot(data.score, 'or')
-            ax.set_xlabel('Iteration')
-            ax.set_ylabel('Score')
+            Score_plot(ax, data)
 
         st.pyplot(fig)
 
@@ -130,49 +132,47 @@ def launch_gui():
         # Run processing
         if st.button("Run Processing"):
             if selected_process == "Simple Run":
-                data = simple_run(data, rbf_type=rbf_type, data_used=data_used, induct_used=induct_used,
+                data = simple_run(data, rbf_type=rbf_type, data_used=data_used, induct_used=induct_choice,
                                   der_used=der_used, cv_type=cv_type, reg_param=reg_param,
                                   shape_control=shape_control, coeff=coeff)
             elif selected_process == "Bayesian Run":
-                sample_number = st.number_input("Sample Number", value=2000)
-                data = Bayesian_run(data, rbf_type=rbf_type, data_used=data_used, induct_used=induct_used,
+                data = Bayesian_run(data, rbf_type=rbf_type, data_used=data_used, induct_used=induct_choice,
                                     der_used=der_used, cv_type=cv_type, reg_param=reg_param,
                                     shape_control=shape_control, coeff=coeff, NMC_sample=sample_number)
             elif selected_process == "BHT Run":
                 data = BHT_run(data, rbf_type, der_used, shape_control, coeff)
             elif selected_process == "Peak Analysis Run":
-                peak_method = st.selectbox("Peak Method", ["separate", "combine"])
-                N_peaks = st.number_input("Number of Peaks", value=1)
-                data = peak_analysis(data, rbf_type=rbf_type, data_used=data_used, induct_used=induct_used,
+                data = peak_analysis(data, rbf_type=rbf_type, data_used=data_used, induct_used=induct_choice,
                                      der_used=der_used, cv_type=cv_type, reg_param=reg_param,
                                      shape_control=shape_control, coeff=coeff, peak_method=peak_method, N_peaks=N_peaks)
 
             # Update plot after processing
-            if selected_plot == "DRT_data":
-                fig, ax = plt.subplots()
-                ax.semilogx(data.out_tau_vec, data.gamma, 'k', linewidth=3)
-                ax.set_xlabel(r'$\tau/s$')
-                ax.set_ylabel(r'$\gamma(log \tau)/\Omega$')
-                ax.set_ylim([0, 1.1 * max(data.gamma)])
-                ax.set_xlim([min(data.out_tau_vec), max(data.out_tau_vec)])
-                st.pyplot(fig)
+            fig, ax = plt.subplots()
+            DRT_data_plot(ax, data)
+            st.pyplot(fig)
 
         # Export options
         export_options = ["None", "Export DRT", "Export EIS", "Export Figure"]
-        selected_export = st.selectbox("Select Export", export_options, index=0)
+        selected_export = st.selectbox("Select Export", export_options, index=0)      
 
         if selected_export == "Export DRT":
-            export_data = data.out_tau_vec, data.gamma
-            export_filename = st.text_input("Enter filename for DRT export", value="drt_export.csv")
-            if st.button("Export DRT"):
-                pd.DataFrame({"tau": export_data[0], "gamma": export_data[1]}).to_csv(export_filename, index=False)
-                st.success(f"DRT exported to {export_filename}")
+            if hasattr(data, 'out_tau_vec') and hasattr(data, 'gamma'):
+                export_data = data.out_tau_vec, data.gamma
+                export_filename = st.text_input("Enter filename for DRT export", value="drt_export.csv")
+                if st.button("Export DRT"):
+                    np.savetxt(export_filename, np.column_stack(export_data), delimiter=",", header="tau,gamma", comments="")
+                    st.success(f"DRT exported to {export_filename}")
+            else:
+                st.warning("No data available for export. Please run the processing first.")
         elif selected_export == "Export EIS":
-            export_data = data.freq, data.mu_Z_re, data.mu_Z_im
-            export_filename = st.text_input("Enter filename for EIS export", value="eis_export.csv")
-            if st.button("Export EIS"):
-                pd.DataFrame({"freq": export_data[0], "mu_Z_re": export_data[1], "mu_Z_im": export_data[2]}).to_csv(export_filename, index=False)
-                st.success(f"EIS exported to {export_filename}")
+            if hasattr(data, 'freq') and hasattr(data, 'mu_Z_re') and hasattr(data, 'mu_Z_im'):
+                export_data = data.freq, data.mu_Z_re, data.mu_Z_im
+                export_filename = st.text_input("Enter filename for EIS export", value="eis_export.csv")
+                if st.button("Export EIS"):
+                    np.savetxt(export_filename, np.column_stack(export_data), delimiter=",", header="freq,mu_Z_re,mu_Z_im", comments="")
+                    st.success(f"EIS exported to {export_filename}")
+            else:
+                st.warning("No data available for export. Please run the processing first.")
         elif selected_export == "Export Figure":
             export_filename = st.text_input("Enter filename for figure export", value="figure.png")
             if st.button("Export Figure"):
