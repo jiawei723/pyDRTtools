@@ -23,6 +23,7 @@ def launch_gui():
 
     # Sidebar widgets
     uploaded_file = st.sidebar.file_uploader("Choose a CSV or TXT file", type=["csv", "txt"])
+
     induct_options = ["Fitting w/o Inductance", "Fitting with Inductance", "Discard Inductive Data"]
     induct_choice = st.sidebar.selectbox("Inductance Included", induct_options)
 
@@ -33,21 +34,19 @@ def launch_gui():
     else:
         induct_used = 0
 
-    # Processing options
-    process_options = ["Simple Run", "Bayesian Run", "BHT Run", "Peak Analysis Run"]
-    selected_process = st.selectbox("Select Processing", process_options)
-
     # Processing parameters
-    rbf_type = st.selectbox("RBF Type", ["Gaussian", "C0 Matern", "C2 Matern", "C4 Matern", "C6 Matern", "Inverse Quadratic", "Inverse Quadric", "Cauchy"])
-    data_used = st.selectbox("Data Used", ["Combined Re-Im Data", "Re Data", "Im Data"])
-    der_used = st.selectbox("Regularization Derivative", ["1st order", "2nd order"])
-    cv_type = st.selectbox("Regularization Method", ["custom", "GCV", "mGCV", "rGCV", "LC", "re-im", "kf"])
-    reg_param = st.number_input("Regularization Parameter", value=1e-3)
-    shape_control = st.selectbox("RBF Shape Control", ["FWHM Coefficient", "Shape Factor"])
-    coeff = st.number_input("FWHM Control", value=0.0)
+    rbf_type = st.sidebar.selectbox("RBF Type", ["Gaussian", "C0 Matern", "C2 Matern", "C4 Matern", "C6 Matern", "Inverse Quadratic", "Inverse Quadric", "Cauchy"])
+    data_used = st.sidebar.selectbox("Data Used", ["Combined Re-Im Data", "Re Data", "Im Data"])
+    der_used = st.sidebar.selectbox("Regularization Derivative", ["1st order", "2nd order"])
+    cv_type = st.sidebar.selectbox("Regularization Method", ["custom", "GCV", "mGCV", "rGCV", "LC", "re-im", "kf"])
+    reg_param = st.sidebar.number_input("Regularization Parameter", value=1e-3)
 
 
-    
+    with st.expander("Options for RBF"):
+        # st.write("This is the content of RBF.")
+        shape_control = st.sidebar.selectbox("RBF Shape Control", ["FWHM Coefficient", "Shape Factor"])
+        coeff = st.sidebar.number_input("FWHM Control", value=0.0)
+
     if uploaded_file is not None:
         # Read data
         data = EIS_object.from_file(uploaded_file)
@@ -122,6 +121,10 @@ def launch_gui():
 
         st.pyplot(fig)
 
+        # Processing options
+        process_options = ["Simple Run", "Bayesian Run", "BHT Run", "Peak Analysis Run"]
+        selected_process = st.selectbox("Select Processing", process_options)
+
         # Run processing
         if st.button("Run Processing"):
             if selected_process == "Simple Run":
@@ -152,8 +155,8 @@ def launch_gui():
             st.pyplot(fig)
 
         # Export options
-        export_options = ["Export DRT", "Export EIS", "Export Figure"]
-        selected_export = st.selectbox("Select Export", export_options)
+        export_options = ["None", "Export DRT", "Export EIS", "Export Figure"]
+        selected_export = st.selectbox("Select Export", export_options, index=0)
 
         if selected_export == "Export DRT":
             export_data = data.out_tau_vec, data.gamma
@@ -172,6 +175,8 @@ def launch_gui():
             if st.button("Export Figure"):
                 fig.savefig(export_filename)
                 st.success(f"Figure exported to {export_filename}")
+        else:
+            st.write("No export selected")
 
 def main():
     launch_gui()
