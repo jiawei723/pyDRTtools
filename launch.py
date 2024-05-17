@@ -11,8 +11,8 @@ import pandas as pd
 import numpy as np
 from numpy import log10, absolute, angle
 import matplotlib.pyplot as plt
-from . import layout
-from .runs import *
+from pyDRTtools import layout
+from pyDRTtools.runs import *
 
 def launch_gui():
     st.set_page_config(page_title="pyDRTtools GUI", page_icon=":chart_with_upwards_trend:", layout="wide")
