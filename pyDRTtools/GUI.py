@@ -716,8 +716,8 @@ def DRT_data_plot(ax, data):
             ax.semilogx(data.out_tau_vec, data.out_gamma_fit, color='green', linewidth=3)
         y_min = 0
         y_max = max(data.gamma)
-    ax.set_xlabel(r'$\\tau/s$')
-    ax.set_ylabel(r'$\\gamma(log \\tau)/\\Omega$')
+    ax.set_xlabel(r'$\tau/s$')
+    ax.set_ylabel(r'$\gamma(log \tau)/\Omega$')
     ax.set_ylim([y_min, 1.1 * y_max])
     ax.set_xlim([min(data.out_tau_vec), max(data.out_tau_vec)])
 
@@ -738,7 +738,7 @@ def Score_plot(ax, data):
         ax.set_ylim([0, 125])
         ax.set_xlim([-0.5, 5.5])
         ax.set_xticks(x)
-        ax.set_xticklabels((r'$s_{1\\sigma}$', r'$s_{2\\sigma}$', r'$s_{3\\sigma}$', r'$s_{\\mu}$', r'$s_{\\rm HD}$', r'$s_{\\rm JSD}$'))
+        ax.set_xticklabels((r'$s_{1\sigma}$', r'$s_{2\sigma}$', r'$s_{3\sigma}$', r'$s_{\mu}$', r'$s_{\rm HD}$', r'$s_{\rm JSD}$'))
         ax.set_yticks([0, 50, 100])
-        ax.set_ylabel(r'$\\rm Scores (\\%)$')
+        ax.set_ylabel(r'$\rm Scores (\%)$')
     
