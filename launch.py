@@ -15,8 +15,8 @@ from pyDRTtools import layout
 from pyDRTtools.runs import *
 
 def launch_gui():
-    st.set_page_config(page_title="pyDRTtools GUI", page_icon=":chart_with_upwards_trend:", layout="wide")
-    st.title("pyDRTtools GUI")
+    st.set_page_config(page_title="DRTtools", page_icon=":chart_with_upwards_trend:", layout="wide")
+    st.title("DRTtools")
 
     # Initialize data
     data = None

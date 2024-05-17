@@ -54,20 +54,24 @@ class EIS_object(object):
         self.method = 'none'
     
     @classmethod
-    def from_file(cls,filename):
-        
-        if filename.endswith('.csv'): # import from csv file
-            data = pd.read_csv(filename, header=None).to_numpy()
+    def from_file(cls, file):
+        if isinstance(file, str):
+            filename = file
+        else:  # assume it's an UploadedFile object
+            filename = file.name
+
+        if filename.endswith('.csv'):  # import from csv file
+            data = pd.read_csv(file, header=None).to_numpy()
             freq = data[:, 0]
             Z_prime = data[:, 1]
             Z_double_prime = data[:, 2]
-        
-        elif filename.endswith('.txt'): # import from txt file
-            data = np.loadtxt(filename)
+
+        elif filename.endswith('.txt'):  # import from txt file
+            data = np.loadtxt(file)
             freq = data[:, 0]
             Z_prime = data[:, 1]
             Z_double_prime = data[:, 2]
-    
+
         return cls(freq, Z_prime, Z_double_prime)
     
     def plot_DRT(self): # plot the DRT result
