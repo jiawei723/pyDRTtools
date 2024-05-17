@@ -42,8 +42,7 @@ def launch_gui():
     reg_param = st.sidebar.number_input("Regularization Parameter", value=1e-3)
 
 
-    with st.expander("Options for RBF"):
-        # st.write("This is the content of RBF.")
+    with st.sidebar.expander("Options for RBF"):
         shape_control = st.sidebar.selectbox("RBF Shape Control", ["FWHM Coefficient", "Shape Factor"])
         coeff = st.sidebar.number_input("FWHM Control", value=0.0)
 
@@ -146,13 +145,14 @@ def launch_gui():
                                      shape_control=shape_control, coeff=coeff, peak_method=peak_method, N_peaks=N_peaks)
 
             # Update plot after processing
-            fig, ax = plt.subplots()
-            ax.semilogx(data.out_tau_vec, data.gamma, 'k', linewidth=3)
-            ax.set_xlabel(r'$\tau/s$')
-            ax.set_ylabel(r'$\gamma(log \tau)/\Omega$')
-            ax.set_ylim([0, 1.1 * max(data.gamma)])
-            ax.set_xlim([min(data.out_tau_vec), max(data.out_tau_vec)])
-            st.pyplot(fig)
+            if selected_plot == "DRT_data":
+                fig, ax = plt.subplots()
+                ax.semilogx(data.out_tau_vec, data.gamma, 'k', linewidth=3)
+                ax.set_xlabel(r'$\tau/s$')
+                ax.set_ylabel(r'$\gamma(log \tau)/\Omega$')
+                ax.set_ylim([0, 1.1 * max(data.gamma)])
+                ax.set_xlim([min(data.out_tau_vec), max(data.out_tau_vec)])
+                st.pyplot(fig)
 
         # Export options
         export_options = ["None", "Export DRT", "Export EIS", "Export Figure"]
