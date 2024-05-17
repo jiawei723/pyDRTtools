@@ -132,17 +132,17 @@ def launch_gui():
         # Run processing
         if st.button("Run Processing"):
             if selected_process == "Simple Run":
-                data = simple_run(data, rbf_type=rbf_type, data_used=data_used, induct_used=induct_choice,
+                data = simple_run(data, rbf_type=rbf_type, data_used=data_used, induct_used=induct_used,
                                   der_used=der_used, cv_type=cv_type, reg_param=reg_param,
                                   shape_control=shape_control, coeff=coeff)
             elif selected_process == "Bayesian Run":
-                data = Bayesian_run(data, rbf_type=rbf_type, data_used=data_used, induct_used=induct_choice,
+                data = Bayesian_run(data, rbf_type=rbf_type, data_used=data_used, induct_used=induct_used,
                                     der_used=der_used, cv_type=cv_type, reg_param=reg_param,
                                     shape_control=shape_control, coeff=coeff, NMC_sample=sample_number)
             elif selected_process == "BHT Run":
                 data = BHT_run(data, rbf_type, der_used, shape_control, coeff)
             elif selected_process == "Peak Analysis Run":
-                data = peak_analysis(data, rbf_type=rbf_type, data_used=data_used, induct_used=induct_choice,
+                data = peak_analysis(data, rbf_type=rbf_type, data_used=data_used, induct_used=induct_used,
                                      der_used=der_used, cv_type=cv_type, reg_param=reg_param,
                                      shape_control=shape_control, coeff=coeff, peak_method=peak_method, N_peaks=N_peaks)
 
