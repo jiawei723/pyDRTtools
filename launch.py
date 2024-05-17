@@ -42,14 +42,15 @@ def launch_gui():
                 data.tau_fine = np.logspace(log10(data.tau.min()) - 0.5, log10(data.tau.max()) + 0.5, 10 * data.freq.shape[0])
                 data.method = "none"
                                 
-            drt_type = st.selectbox("Type of DRT", ["gamma vs tau", "gamma vs frequency", "g vs tau", "g vs frequency"])
-            rbf_type = st.sidebar.selectbox("Method of Discretization", ["Gaussian", "C0 Matern", "C2 Matern", "C4 Matern", "C6 Matern", "Inverse Quadratic", "Inverse Quadric", "Cauchy"])
-            data_used = st.sidebar.selectbox("Data Used", ["Combined Re-Im Data", "Re Data", "Im Data"])
+            drt_type_options = ["Gamma vs Tau", "Gamma vs Frequency", "G vs Tau", "G vs Frequency"]
+            drt_type = st.selectbox("DRT Type", drt_type_options)
+            rbf_type = st.selectbox("Method of Discretization", ["Gaussian", "C0 Matern", "C2 Matern", "C4 Matern", "C6 Matern", "Inverse Quadratic", "Inverse Quadric", "Cauchy"])
+            data_used = st.selectbox("Data Used", ["Combined Re-Im Data", "Re Data", "Im Data"])
             
             
-            der_used = st.sidebar.selectbox("Regularization Derivative", ["1st order", "2nd order"])
-            cv_type = st.sidebar.selectbox("Regularization Method", ["custom", "GCV", "mGCV", "rGCV", "LC", "re-im", "kf"])
-            reg_param = st.sidebar.number_input("Regularization Parameter", value=1e-3, format="%.6f")
+            der_used = st.selectbox("Regularization Derivative", ["1st order", "2nd order"])
+            cv_type = st.selectbox("Regularization Method", ["custom", "GCV", "mGCV", "rGCV", "LC", "re-im", "kf"])
+            reg_param = st.number_input("Regularization Parameter", value=1e-3, format="%.6f")
 
     if induct_choice == "Fitting w/o Inductance" :
         induct_used = 1
@@ -99,7 +100,7 @@ def launch_gui():
     if data is not None:
 
         # Plot options
-        plot_options = ["EIS_data", "Magnitude", "Phase", "Re_data", "Im_data", "Re_residual", "Im_residual", "DRT_data", "EIS_Score"]
+        plot_options = ["EIS_data", "Magnitude", "Phase", "Re_data", "Im_data", "Re_residual", "Im_residual", "DRT_data", "Score"]
         selected_plot = st.selectbox("Select Plot", plot_options)
 
         # Plot data
@@ -148,7 +149,7 @@ def launch_gui():
 
             # Update plot after processing
             fig, ax = plt.subplots()
-            DRT_data_plot(ax, data)
+            DRT_data_plot(ax, data, drt_type)
             st.pyplot(fig)
 
         # Export options

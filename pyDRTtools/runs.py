@@ -422,6 +422,8 @@ def BHT_run(entry, rbf_type = 'Gaussian', der_used = '1st order', shape_control 
     entry.M = np.zeros((N_taus+1, N_taus+1))
     entry.M[1:,1:] = entry.M_temp 
     
+    max_iterations = 1000
+    iteration_count = 0
     # Step 3: test HT_single_est (try until no error occur for the HT_single_est)
     while True:
         try:
@@ -433,7 +435,11 @@ def BHT_run(entry, rbf_type = 'Gaussian', der_used = '1st order', shape_control 
             break
             
         except:
-            print('Error Occur, Try Another Inital Condition')
+            iteration_count += 1
+            if iteration_count >= max_iterations:
+                print(f"Error: Maximum iterations ({max_iterations}) reached. Aborting.")
+                return None
+            print(f"Error occurred, trying another initial condition. Iteration: {iteration_count}")
     
     # Step 4: score the EIS
     entry.out_scores = BHT.EIS_score(theta_0, entry.freq, entry.Z_exp, out_dict_real, out_dict_imag, N_MC_samples=10000)
