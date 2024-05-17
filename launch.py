@@ -138,7 +138,7 @@ def launch_gui():
             st.pyplot(fig)
 
         # Export options
-        export_options = ["None", "Export DRT", "Export EIS", "Export Figure"]
+        export_options = ["Export DRT", "Export EIS", "Export Figure"]
         selected_export = st.selectbox("Select Export", export_options, index=0)      
 
         if selected_export == "Export DRT":
