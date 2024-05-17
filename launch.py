@@ -25,7 +25,7 @@ def launch_gui():
         with st.expander("Setting"):
             # Processing parameters
             induct_options = ["Fitting w/o Inductance", "Fitting with Inductance", "Discard Inductive Data"]
-            induct_choice = st.sidebar.selectbox("Inductance Included", induct_options)
+            induct_choice = st.selectbox("Inductance Included", induct_options)
             if induct_choice == "Discard Inductive Data" and data is not None:
                 data.freq = data.freq[-data.Z_double_prime > 0]
                 data.Z_prime = data.Z_prime[-data.Z_double_prime > 0]
@@ -75,26 +75,6 @@ def launch_gui():
         with st.expander("Options for Peak Analysis"):
             peak_method = st.selectbox("Peak Method", ["separate", "combine"])
             N_peaks = st.number_input("Number of Peaks", value=1.0, min_value=1.0, step=1.0)
-
-    # if uploaded_file is not None:
-    #     # Read data
-    #     data = EIS_object.from_file(uploaded_file)
-
-    #     # Discard inductance data if necessary
-    #     if induct_choice == "Discard Inductive Data":
-    #         data.freq = data.freq[-data.Z_double_prime > 0]
-    #         data.Z_prime = data.Z_prime[-data.Z_double_prime > 0]
-    #         data.Z_double_prime = data.Z_double_prime[-data.Z_double_prime > 0]
-    #         data.Z_exp = data.Z_prime + data.Z_double_prime * 1j
-    #     else:
-    #         data.freq = data.freq_0
-    #         data.Z_prime = data.Z_prime_0
-    #         data.Z_double_prime = data.Z_double_prime_0
-    #         data.Z_exp = data.Z_exp_0
-
-    #     data.tau = 1 / data.freq
-    #     data.tau_fine = np.logspace(log10(data.tau.min()) - 0.5, log10(data.tau.max()) + 0.5, 10 * data.freq.shape[0])
-    #     data.method = "none"
 
     # Main content
     if data is not None:
