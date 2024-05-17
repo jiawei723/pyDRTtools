@@ -7,7 +7,11 @@ from pyDRTtools import layout
 from pyDRTtools.runs import *
 from pyDRTtools.GUI import *
 
+processed_data = None
+
 def launch_gui():
+    global processed_data
+
     st.set_page_config(page_title="DRTtools", page_icon=":chart_with_upwards_trend:", layout="wide")
     st.title("DRTtools")
 
@@ -114,23 +118,23 @@ def launch_gui():
         # Run processing
         if st.button("Run Processing"):
             if selected_process == "Simple Run":
-                data = simple_run(data, rbf_type=rbf_type, data_used=data_used, induct_used=induct_used,
+                processed_data = simple_run(data, rbf_type=rbf_type, data_used=data_used, induct_used=induct_used,
                                   der_used=der_used, cv_type=cv_type, reg_param=reg_param,
                                   shape_control=shape_control, coeff=coeff)
             elif selected_process == "Bayesian Run":
-                data = Bayesian_run(data, rbf_type=rbf_type, data_used=data_used, induct_used=induct_used,
+                processed_data = Bayesian_run(data, rbf_type=rbf_type, data_used=data_used, induct_used=induct_used,
                                     der_used=der_used, cv_type=cv_type, reg_param=reg_param,
                                     shape_control=shape_control, coeff=coeff, NMC_sample=sample_number)
             elif selected_process == "BHT Run":
-                data = BHT_run(data, rbf_type, der_used, shape_control, coeff)
+                processed_data = BHT_run(data, rbf_type, der_used, shape_control, coeff)
             elif selected_process == "Peak Analysis Run":
-                data = peak_analysis(data, rbf_type=rbf_type, data_used=data_used, induct_used=induct_used,
+                processed_data = peak_analysis(data, rbf_type=rbf_type, data_used=data_used, induct_used=induct_used,
                                      der_used=der_used, cv_type=cv_type, reg_param=reg_param,
                                      shape_control=shape_control, coeff=coeff, peak_method=peak_method, N_peaks=N_peaks)
 
             # Update plot after processing
             fig, ax = plt.subplots()
-            DRT_data_plot(ax, data, drt_type)
+            DRT_data_plot(ax, processed_data, drt_type)
             st.pyplot(fig)
 
         # Export options
@@ -138,8 +142,8 @@ def launch_gui():
         selected_export = st.selectbox("Select Export", export_options, index=0)      
 
         if selected_export == "Export DRT":
-            if hasattr(data, 'out_tau_vec') and hasattr(data, 'gamma'):
-                export_data = data.out_tau_vec, data.gamma
+            if processed_data is not None and hasattr(processed_data, 'out_tau_vec') and hasattr(processed_data, 'gamma'):
+                export_data = processed_data.out_tau_vec, processed_data.gamma
                 export_filename = st.text_input("Enter filename for DRT export", value="drt_export.csv")
                 if st.button("Export DRT"):
                     np.savetxt(export_filename, np.column_stack(export_data), delimiter=",", header="tau,gamma", comments="")
@@ -147,8 +151,8 @@ def launch_gui():
             else:
                 st.warning("No data available for export. Please run the processing first.")
         elif selected_export == "Export EIS":
-            if hasattr(data, 'freq') and hasattr(data, 'mu_Z_re') and hasattr(data, 'mu_Z_im'):
-                export_data = data.freq, data.mu_Z_re, data.mu_Z_im
+            if processed_data is not None and hasattr(processed_data, 'freq') and hasattr(processed_data, 'mu_Z_re') and hasattr(processed_data, 'mu_Z_im'):
+                export_data = processed_data.freq, processed_data.mu_Z_re, processed_data.mu_Z_im
                 export_filename = st.text_input("Enter filename for EIS export", value="eis_export.csv")
                 if st.button("Export EIS"):
                     np.savetxt(export_filename, np.column_stack(export_data), delimiter=",", header="freq,mu_Z_re,mu_Z_im", comments="")
