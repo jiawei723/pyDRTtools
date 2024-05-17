@@ -42,8 +42,9 @@ def launch_gui():
                 data.tau_fine = np.logspace(log10(data.tau.min()) - 0.5, log10(data.tau.max()) + 0.5, 10 * data.freq.shape[0])
                 data.method = "none"
                                 
-            drt_type_options = ["Gamma vs Tau", "Gamma vs Frequency", "G vs Tau", "G vs Frequency"]
-            drt_type = st.selectbox("DRT Type", drt_type_options)
+            # drt_type_options = ["Gamma vs Tau", "Gamma vs Frequency", "G vs Tau", "G vs Frequency"] 
+            # drt_type = st.selectbox("DRT Type", drt_type_options)
+            drt_type = "Gamma vs Tau"
             rbf_type = st.selectbox("Method of Discretization", ["Gaussian", "C0 Matern", "C2 Matern", "C4 Matern", "C6 Matern", "Inverse Quadratic", "Inverse Quadric", "Cauchy"])
             data_used = st.selectbox("Data Used", ["Combined Re-Im Data", "Re Data", "Im Data"])
             

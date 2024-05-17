@@ -685,7 +685,7 @@ def Im_residual_plot(ax, data):
     ax.set_ylim([-1.1 * y_max, 1.1 * y_max])
     ax.ticklabel_format(axis='y', style="sci", scilimits=(0, 0))
 
-def DRT_data_plot(ax, data, drt_type):
+def DRT_data_plot(ax, data, drt_type="Gamma vs Tau"):
     if data.method == 'none':
         return
     elif data.method == 'simple':
