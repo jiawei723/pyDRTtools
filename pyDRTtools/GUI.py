@@ -690,7 +690,7 @@ def DRT_data_plot(ax, data, drt_type="Gamma vs Tau"):
         return
     elif data.method == 'simple':
         if drt_type == "Gamma vs Tau":
-            ax.semilogx(1./data.out_tau_vec, data.gamma, 'k', linewidth=3)
+            ax.semilogx(data.out_tau_vec, data.gamma, 'k', linewidth=3)
             y_min = 0
             y_max = max(data.gamma)
             xlabel = r'$\tau/s$'
