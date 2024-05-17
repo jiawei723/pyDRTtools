@@ -42,9 +42,12 @@ def launch_gui():
     reg_param = st.sidebar.number_input("Regularization Parameter", value=1e-3)
 
 
-    with st.sidebar.expander("Options for RBF"):
-        shape_control = st.sidebar.selectbox("RBF Shape Control", ["FWHM Coefficient", "Shape Factor"])
-        coeff = st.sidebar.number_input("FWHM Control", value=0.0)
+    sidebar_container = st.sidebar.container()
+
+    with sidebar_container:
+        with st.expander("Options for RBF"):
+            shape_control = st.selectbox("RBF Shape Control", ["FWHM Coefficient", "Shape Factor"])
+            coeff = st.number_input("FWHM Control", value=0.5)
 
     if uploaded_file is not None:
         # Read data
