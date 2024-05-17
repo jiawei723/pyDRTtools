@@ -322,6 +322,7 @@ def simple_run(entry, rbf_type = 'Gaussian', data_used = 'Combined Re-Im Data', 
     entry.out_tau_vec, entry.gamma = basics.x_to_gamma(x[N_RL:], entry.tau_fine, entry.tau, entry.epsilon, rbf_type)
     entry.N_RL = N_RL 
     entry.method = 'simple'
+    entry.freq_fine = 1./entry.out_tau_vec
     
     return entry
 
@@ -376,6 +377,7 @@ def Bayesian_run(entry, rbf_type = 'Gaussian', data_used = 'Combined Re-Im Data'
     entry.out_tau_vec,entry.upper_bound = basics.x_to_gamma(entry.upper_bound, entry.tau_fine, entry.tau, entry.epsilon, rbf_type)
     entry.out_tau_vec,entry.mean = basics.x_to_gamma(entry.mean, entry.tau_fine, entry.tau, entry.epsilon, rbf_type)
     
+    entry.freq_fine = 1./entry.out_tau_vec
     entry.method = 'credit'
 
     return entry
@@ -505,6 +507,7 @@ def BHT_run(entry, rbf_type = 'Gaussian', der_used = '1st order', shape_control 
     entry.res_H_re = entry.mu_Z_H_re_agm-entry.b_re
     entry.res_H_im = entry.mu_Z_H_im_agm-entry.b_im
     
+    entry.freq_fine = 1./entry.out_tau_vec
     entry.method = 'BHT'    
     
     return entry
@@ -618,6 +621,7 @@ def peak_analysis(entry, rbf_type = 'Gaussian', data_used = 'Combined Re-Im Data
     
         entry.out_gamma_fit = entry.gamma_fit_tot
         
+    entry.freq_fine = 1./entry.out_tau_vec
     entry.method = 'peak'   
     
     return entry

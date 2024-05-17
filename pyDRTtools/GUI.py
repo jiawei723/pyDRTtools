@@ -696,13 +696,13 @@ def DRT_data_plot(ax, data, drt_type="Gamma vs Tau"):
             xlabel = r'$\tau/s$'
             ylabel = r'$\gamma(\ln\tau)/\Omega$'
         elif drt_type == "Gamma vs Frequency":
-            ax.semilogx(data.freq_fine, data.gamma_ridge_fine, 'k', linewidth=3)
+            ax.semilogx(data.freq_fine, data.gamma, 'k', linewidth=3)
             y_min = 0
-            y_max = max(data.gamma_ridge_fine)
+            y_max = max(data.gamma)
             xlabel = r'$f$/Hz'
             ylabel = r'$\gamma(\ln f)/\Omega$'
         elif drt_type == "G vs Tau":
-            ax.semilogx(1./data.out_tau_vec, data.gamma*data.freq_fine, 'k', linewidth=3)
+            ax.semilogx(data.out_tau_vec, data.gamma*data.freq_fine, 'k', linewidth=3)
             y_min = 0
             y_max = max(data.gamma*data.freq_fine)
             xlabel = r'$\tau/s$'
@@ -715,53 +715,53 @@ def DRT_data_plot(ax, data, drt_type="Gamma vs Tau"):
             ylabel = r'$g(f)/(\Omega/\rm s)$'
     elif data.method == 'credit':
         if drt_type == "Gamma vs Tau":
-            ax.fill_between(1./data.out_tau_vec, data.lower_bound, data.upper_bound, facecolor='lightgrey')
-            ax.semilogx(1./data.out_tau_vec, data.gamma, color='black', label='MAP', linewidth=3)
-            ax.semilogx(1./data.out_tau_vec, data.mean, color='blue', label='mean', linewidth=3)
-            ax.semilogx(1./data.out_tau_vec, data.lower_bound, color='black')
-            ax.semilogx(1./data.out_tau_vec, data.upper_bound, color='black')
+            ax.fill_between(data.out_tau_vec, data.lower_bound, data.upper_bound, facecolor='lightgrey')
+            ax.semilogx(data.out_tau_vec, data.gamma, color='black', label='MAP', linewidth=3)
+            ax.semilogx(data.out_tau_vec, data.mean, color='blue', label='mean', linewidth=3)
+            ax.semilogx(data.out_tau_vec, data.lower_bound, color='black')
+            ax.semilogx(data.out_tau_vec, data.upper_bound, color='black')
             ax.legend(frameon=False, fontsize=15)
             y_min = 0
             y_max = max(data.upper_bound)
             xlabel = r'$\tau/s$'
             ylabel = r'$\gamma(\ln\tau)/\Omega$'
         elif drt_type == "Gamma vs Frequency":
-            ax.fill_between(data.freq_fine, data.lower_bound_fine, data.upper_bound_fine, facecolor='lightgrey')
-            ax.semilogx(data.freq_fine, data.gamma_ridge_fine, color='black', label='MAP', linewidth=3)
-            ax.semilogx(data.freq_fine, data.gamma_mean_fine, color='blue', label='mean', linewidth=3)
-            ax.semilogx(data.freq_fine, data.lower_bound_fine, color='black')
-            ax.semilogx(data.freq_fine, data.upper_bound_fine, color='black')
+            ax.fill_between(data.freq_fine, data.lower_bound, data.upper_bound, facecolor='lightgrey')
+            ax.semilogx(data.freq_fine, data.gamma, color='black', label='MAP', linewidth=3)
+            ax.semilogx(data.freq_fine, data.mean, color='blue', label='mean', linewidth=3)
+            ax.semilogx(data.freq_fine, data.lower_bound, color='black')
+            ax.semilogx(data.freq_fine, data.upper_bound, color='black')
             ax.legend(frameon=False, fontsize=15)
             y_min = 0
-            y_max = max(data.upper_bound_fine)
+            y_max = max(data.upper_bound)
             xlabel = r'$f$/Hz'
             ylabel = r'$\gamma(\ln f)/\Omega$'
         elif drt_type == "G vs Tau":
-            ax.fill_between(1./data.out_tau_vec, data.lower_bound*data.freq_fine, data.upper_bound*data.freq_fine, facecolor='lightgrey')
-            ax.semilogx(1./data.out_tau_vec, data.gamma*data.freq_fine, color='black', label='MAP', linewidth=3)
-            ax.semilogx(1./data.out_tau_vec, data.mean*data.freq_fine, color='blue', label='mean', linewidth=3)
-            ax.semilogx(1./data.out_tau_vec, data.lower_bound*data.freq_fine, color='black')
-            ax.semilogx(1./data.out_tau_vec, data.upper_bound*data.freq_fine, color='black')
+            ax.fill_between(data.out_tau_vec, data.lower_bound*data.freq_fine, data.upper_bound*data.freq_fine, facecolor='lightgrey')
+            ax.semilogx(data.out_tau_vec, data.gamma*data.freq_fine, color='black', label='MAP', linewidth=3)
+            ax.semilogx(data.out_tau_vec, data.mean*data.freq_fine, color='blue', label='mean', linewidth=3)
+            ax.semilogx(data.out_tau_vec, data.lower_bound*data.freq_fine, color='black')
+            ax.semilogx(data.out_tau_vec, data.upper_bound*data.freq_fine, color='black')
             ax.legend(frameon=False, fontsize=15)
             y_min = 0
             y_max = max(data.upper_bound*data.freq_fine)
             xlabel = r'$\tau/s$'
             ylabel = r'$g(\tau)/(\Omega/\rm s)$'
         elif drt_type == "G vs Frequency":
-            ax.fill_between(data.freq_fine, data.lower_bound_fine*data.freq_fine, data.upper_bound_fine*data.freq_fine, facecolor='lightgrey')
-            ax.semilogx(data.freq_fine, data.gamma_ridge_fine*data.freq_fine, color='black', label='MAP', linewidth=3)
-            ax.semilogx(data.freq_fine, data.gamma_mean_fine*data.freq_fine, color='blue', label='mean', linewidth=3)
-            ax.semilogx(data.freq_fine, data.lower_bound_fine*data.freq_fine, color='black')
-            ax.semilogx(data.freq_fine, data.upper_bound_fine*data.freq_fine, color='black')
+            ax.fill_between(data.freq_fine, data.lower_bound*data.freq_fine, data.upper_bound*data.freq_fine, facecolor='lightgrey')
+            ax.semilogx(data.freq_fine, data.gamma*data.freq_fine, color='black', label='MAP', linewidth=3)
+            ax.semilogx(data.freq_fine, data.mean*data.freq_fine, color='blue', label='mean', linewidth=3)
+            ax.semilogx(data.freq_fine, data.lower_bound*data.freq_fine, color='black')
+            ax.semilogx(data.freq_fine, data.upper_bound*data.freq_fine, color='black')
             ax.legend(frameon=False, fontsize=15)
             y_min = 0
-            y_max = max(data.upper_bound_fine*data.freq_fine)
+            y_max = max(data.upper_bound*data.freq_fine)
             xlabel = r'$f$/Hz'
             ylabel = r'$g(f)/(\Omega/\rm s)$'
     elif data.method == 'BHT':
         if drt_type == "Gamma vs Tau":
-            ax.semilogx(1./data.out_tau_vec, data.mu_gamma_fine_re, 'b', linewidth=3, label='$Mean Re$')
-            ax.semilogx(1./data.out_tau_vec, data.mu_gamma_fine_im, 'k', linewidth=3, label='$Mean Im$')
+            ax.semilogx(data.out_tau_vec, data.mu_gamma_fine_re, 'b', linewidth=3, label='$Mean Re$')
+            ax.semilogx(data.out_tau_vec, data.mu_gamma_fine_im, 'k', linewidth=3, label='$Mean Im$')
             y_min = min(np.concatenate((data.mu_gamma_fine_re, data.mu_gamma_fine_im)))
             y_max = max(np.concatenate((data.mu_gamma_fine_re, data.mu_gamma_fine_im)))
             xlabel = r'$\tau/s$'
@@ -774,8 +774,8 @@ def DRT_data_plot(ax, data, drt_type="Gamma vs Tau"):
             xlabel = r'$f$/Hz'
             ylabel = r'$\gamma(\ln f)/\Omega$'
         elif drt_type == "G vs Tau":
-            ax.semilogx(1./data.out_tau_vec, data.mu_gamma_fine_re*data.freq_fine, 'b', linewidth=3, label='$Mean Re$')
-            ax.semilogx(1./data.out_tau_vec, data.mu_gamma_fine_im*data.freq_fine, 'k', linewidth=3, label='$Mean Im$')
+            ax.semilogx(data.out_tau_vec, data.mu_gamma_fine_re*data.freq_fine, 'b', linewidth=3, label='$Mean Re$')
+            ax.semilogx(data.out_tau_vec, data.mu_gamma_fine_im*data.freq_fine, 'k', linewidth=3, label='$Mean Im$')
             y_min = min(np.concatenate((data.mu_gamma_fine_re*data.freq_fine, data.mu_gamma_fine_im*data.freq_fine)))
             y_max = max(np.concatenate((data.mu_gamma_fine_re*data.freq_fine, data.mu_gamma_fine_im*data.freq_fine)))
             xlabel = r'$\tau/s$'
@@ -801,39 +801,39 @@ def DRT_data_plot(ax, data, drt_type="Gamma vs Tau"):
             xlabel = r'$\tau/s$'
             ylabel = r'$\gamma(\ln\tau)/\Omega$'
         elif drt_type == "Gamma vs Frequency":
-            ax.semilogx(data.freq_fine, data.gamma_ridge_fine, color='black', linewidth=3)
+            ax.semilogx(data.freq_fine, data.gamma, color='black', linewidth=3)
             color = ['red', 'green', 'cyan', 'yellow', 'orange', 'blue', 'grey', 'brown', 'coral', 'darkblue', 'darkgreen', 'gold']
-            if len(data.gamma_gauss_mat) == data.N_peaks:
+            if len(data.out_gamma_fit) == data.N_peaks:
                 for i in range(data.N_peaks):
-                    ax.semilogx(data.freq_fine, data.gamma_gauss_mat[:, i], color=color[i], linewidth=3)
+                    ax.semilogx(data.freq_fine, data.out_gamma_fit[i], color=color[i], linewidth=3)
             else:
-                ax.semilogx(data.freq_fine, data.gamma_gauss_mat, color='green', linewidth=3)
+                ax.semilogx(data.freq_fine, data.out_gamma_fit, color='green', linewidth=3)
             y_min = 0
-            y_max = max(data.gamma_ridge_fine)
+            y_max = max(data.gamma)
             xlabel = r'$f$/Hz'
             ylabel = r'$\gamma(\ln f)/\Omega$'
         elif drt_type == "G vs Tau":
-            ax.semilogx(1./data.out_tau_vec, data.gamma*data.freq_fine, color='black', linewidth=3)
+            ax.semilogx(data.out_tau_vec, data.gamma*data.freq_fine, color='black', linewidth=3)
             color = ['red', 'green', 'cyan', 'yellow', 'orange', 'blue', 'grey', 'brown', 'coral', 'darkblue', 'darkgreen', 'gold']
-            if len(data.g_gauss_mat) == data.N_peaks:
+            if len(data.out_gamma_fit) == data.N_peaks:
                 for i in range(data.N_peaks):
-                    ax.semilogx(1./data.out_tau_vec, data.g_gauss_mat[:, i], color=color[i], linewidth=3)
+                    ax.semilogx(data.out_tau_vec, data.out_gamma_fit[i], color=color[i], linewidth=3)
             else:
-                ax.semilogx(1./data.out_tau_vec, data.g_gauss_mat, color='green', linewidth=3)
+                ax.semilogx(data.out_tau_vec, data.out_gamma_fit, color='green', linewidth=3)
             y_min = 0
             y_max = max(data.gamma*data.freq_fine)
             xlabel = r'$\tau/s$'
             ylabel = r'$g(\tau)/(\Omega/\rm s)$'
         elif drt_type == "G vs Frequency":
-            ax.semilogx(data.freq_fine, data.gamma_ridge_fine*data.freq_fine, color='black', linewidth=3)
+            ax.semilogx(data.freq_fine, data.gamma*data.freq_fine, color='black', linewidth=3)
             color = ['red', 'green', 'cyan', 'yellow', 'orange', 'blue', 'grey', 'brown', 'coral', 'darkblue', 'darkgreen', 'gold']
-            if len(data.g_gauss_mat) == data.N_peaks:
+            if len(data.out_gamma_fit) == data.N_peaks:
                 for i in range(data.N_peaks):
-                    ax.semilogx(data.freq_fine, data.g_gauss_mat[:, i], color=color[i], linewidth=3)
+                    ax.semilogx(data.freq_fine, data.out_gamma_fit[i], color=color[i], linewidth=3)
             else:
-                ax.semilogx(data.freq_fine, data.g_gauss_mat, color='green', linewidth=3)
+                ax.semilogx(data.freq_fine, data.out_gamma_fit, color='green', linewidth=3)
             y_min = 0
-            y_max = max(data.gamma_ridge_fine*data.freq_fine)
+            y_max = max(data.gamma*data.freq_fine)
             xlabel = r'$f$/Hz'
             ylabel = r'$g(f)/(\Omega/\rm s)$'
     
