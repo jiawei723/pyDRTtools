@@ -110,9 +110,10 @@ def launch_gui():
             Score_plot(ax, data)
 
         st.pyplot(fig)
+        fig.savefig('EIS.png')
 
         # Processing options
-        process_options = ["Simple Run", "Bayesian Run", "BHT Run", "Peak Analysis Run"]
+        process_options = ["Simple Run", "Bayesian Run", "Hilbert Transform", "Peak Analysis Run"]
         selected_process = st.selectbox("Select Processing", process_options)
 
         # Run processing
@@ -125,7 +126,7 @@ def launch_gui():
                 processed_data = Bayesian_run(data, rbf_type=rbf_type, data_used=data_used, induct_used=induct_used,
                                     der_used=der_used, cv_type=cv_type, reg_param=reg_param,
                                     shape_control=shape_control, coeff=coeff, NMC_sample=sample_number)
-            elif selected_process == "BHT Run":
+            elif selected_process == "Hilbert Transform":
                 processed_data = BHT_run(data, rbf_type, der_used, shape_control, coeff)
             elif selected_process == "Peak Analysis Run":
                 processed_data = peak_analysis(data, rbf_type=rbf_type, data_used=data_used, induct_used=induct_used,
@@ -136,42 +137,56 @@ def launch_gui():
             fig, ax = plt.subplots()
             DRT_data_plot(ax, processed_data, drt_type)
             st.pyplot(fig)
+            fig.savefig('DRT.png')
 
         @st.cache_data
-        def convert_df(df):
+        def convert_df(df, drt_type):
+            xd, yd = df
+            x_lable = drt_type.split(" vs ")[1]
+            y_lable = drt_type.split(" vs ")[0]
+            df = pd.DataFrame({x_lable: xd, y_lable: yd})
             return df.to_csv().encode('utf-8')
 
-        def covert_drt_format(df, drt_type):
-
-            return 0
+        @st.cache_data
+        def covert_drt_format(_df, drt_type):
+            if drt_type == "Gamma vs Tau":
+                xd, yd = _df.out_tau_vec, _df.gamma
+            elif drt_type == "Gamma vs Frequency":
+                xd, yd = _df.freq_fine, _df.gamma
+            elif drt_type == "G vs Tau":
+                xd, yd = _df.out_tau_vec, _df.gamma*_df.freq_fine
+            elif drt_type == "G vs Frequency":
+                xd, yd = _df.freq_fine, _df.gamma*_df.freq_fine
+            return xd, yd
         # Export options
         export_options = ["Export DRT", "Export EIS", "Export Figure"]
         selected_export = st.selectbox("Select Export", export_options, index=0)      
 
         if selected_export == "Export DRT":
             if processed_data is not None and hasattr(processed_data, 'out_tau_vec') and hasattr(processed_data, 'gamma'):
-                export_data = processed_data.out_tau_vec, processed_data.gamma
+                export_data = covert_drt_format(processed_data, drt_type)
                 export_filename = st.text_input("Enter filename for DRT export", value="drt_export.csv")
-                if st.button("Export DRT"):
-                    
-                    np.savetxt(export_filename, np.column_stack(export_data), delimiter=",", header="tau,gamma", comments="")
-                    st.success(f"DRT exported to {export_filename}")
+                csv = convert_df(export_data, drt_type)
+                st.download_button(label="Download DRT", data=csv, file_name=export_filename, mime="text/csv")
             else:
                 st.warning("No data available for export. Please run the processing first.")
         elif selected_export == "Export EIS":
             if processed_data is not None and hasattr(processed_data, 'freq') and hasattr(processed_data, 'mu_Z_re') and hasattr(processed_data, 'mu_Z_im'):
                 export_data = processed_data.freq, processed_data.mu_Z_re, processed_data.mu_Z_im
                 export_filename = st.text_input("Enter filename for EIS export", value="eis_export.csv")
-                if st.button("Export EIS"):
-                    np.savetxt(export_filename, np.column_stack(export_data), delimiter=",", header="freq,mu_Z_re,mu_Z_im", comments="")
-                    st.success(f"EIS exported to {export_filename}")
+                df = pd.DataFrame(np.column_stack(export_data), columns=["freq", "mu_Z_re", "mu_Z_im"])
+                csv = df.to_csv().encode('utf-8')
+                st.download_button(label="Download EIS", data=csv, file_name=export_filename, mime="text/csv")
             else:
                 st.warning("No data available for export. Please run the processing first.")
         elif selected_export == "Export Figure":
-            export_filename = st.text_input("Enter filename for figure export", value="figure.png")
-            if st.button("Export Figure"):
-                fig.savefig(export_filename)
-                st.success(f"Figure exported to {export_filename}")
+            export_filename1 = st.text_input("Enter filename for first image", value="img1.png")
+            with open('EIS.png', "rb") as f1:
+                btn1 = st.download_button(label=f"Download {selected_plot} Image", data=f1.read(), file_name=export_filename1, mime="image/png")
+
+            export_filename2 = st.text_input("Enter filename for second image", value="img2.png")
+            with open('DRT.png', "rb") as f2:
+                btn2 = st.download_button(label="Download DRT Image", data=f2.read(), file_name=export_filename2, mime="image/png")
         else:
             st.write("No export selected")
 

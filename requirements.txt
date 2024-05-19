@@ -8,5 +8,4 @@ scikit-learn
 PyQt5==5.15.9
 matplotlib==3.7.3
 pandas==1.5.3
-streamlit
-
+streamlit==1.29.0
