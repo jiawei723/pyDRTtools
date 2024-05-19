@@ -137,6 +137,13 @@ def launch_gui():
             DRT_data_plot(ax, processed_data, drt_type)
             st.pyplot(fig)
 
+        @st.cache_data
+        def convert_df(df):
+            return df.to_csv().encode('utf-8')
+
+        def covert_drt_format(df, drt_type):
+
+            return 0
         # Export options
         export_options = ["Export DRT", "Export EIS", "Export Figure"]
         selected_export = st.selectbox("Select Export", export_options, index=0)      
@@ -146,6 +153,7 @@ def launch_gui():
                 export_data = processed_data.out_tau_vec, processed_data.gamma
                 export_filename = st.text_input("Enter filename for DRT export", value="drt_export.csv")
                 if st.button("Export DRT"):
+                    
                     np.savetxt(export_filename, np.column_stack(export_data), delimiter=",", header="tau,gamma", comments="")
                     st.success(f"DRT exported to {export_filename}")
             else:
